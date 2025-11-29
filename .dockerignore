@@ -1,0 +1,58 @@
+# Git
+.git
+.gitignore
+.gitattributes
+
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+venv/
+env/
+ENV/
+
+# IDE
+.vscode
+.idea
+*.swp
+*.swo
+*~
+
+# Documentation
+*.md
+!README.md
+docs/
+
+# Tests
+tests/
+*.pytest_cache
+
+# Logs
+*.log
+logs/
+
+# Data (ne pas inclure les gros fichiers de données)
+data/raw/*.csv
+data/raw/*.pkl
+data/processed/*.csv
+
+# Models (seront générés dans le conteneur)
+models/*.pkl
+models/*.h5
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Autres
+uploads/*
+!uploads/.gitkeep
+*.tmp
+*.bak

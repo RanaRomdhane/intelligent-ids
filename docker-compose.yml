@@ -1,0 +1,79 @@
+version: '3.8'
+
+services:
+  # IDS ML Application
+  ids-ml:
+    build: .
+    container_name: ids-ml-app
+    ports:
+      - "5000:5000"
+    environment:
+      - FLASK_ENV=production
+      - ELASTICSEARCH_HOSTS=elasticsearch:9200
+      - SIEM_ENABLED=true
+      - LOG_LEVEL=INFO
+    volumes:
+      - ./data:/app/data
+      - ./models:/app/models
+      - ./logs:/app/logs
+    depends_on:
+      - elasticsearch
+    networks:
+      - ids-network
+    restart: unless-stopped
+
+  # Elasticsearch
+  elasticsearch:
+    image: docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+    container_name: ids-elasticsearch
+    environment:
+      - discovery.type=single-node
+      - "ES_JAVA_OPTS=-Xms512m -Xmx512m"
+      - xpack.security.enabled=false
+    ports:
+      - "9200:9200"
+    volumes:
+      - es-data:/usr/share/elasticsearch/data
+    networks:
+      - ids-network
+    restart: unless-stopped
+
+  # Kibana
+  kibana:
+    image: docker.elastic.co/kibana/kibana:8.12.0
+    container_name: ids-kibana
+    ports:
+      - "5601:5601"
+    environment:
+      - ELASTICSEARCH_HOSTS=http://elasticsearch:9200
+    depends_on:
+      - elasticsearch
+    networks:
+      - ids-network
+    restart: unless-stopped
+
+  # Logstash (optionnel)
+  logstash:
+    image: docker.elastic.co/logstash/logstash:8.12.0
+    container_name: ids-logstash
+    ports:
+      - "5044:5044"
+      - "9600:9600"
+    environment:
+      - "LS_JAVA_OPTS=-Xmx256m -Xms256m"
+    volumes:
+      - ./logstash/pipeline:/usr/share/logstash/pipeline
+      - ./logstash/config/logstash.yml:/usr/share/logstash/config/logstash.yml
+    depends_on:
+      - elasticsearch
+    networks:
+      - ids-network
+    restart: unless-stopped
+
+networks:
+  ids-network:
+    driver: bridge
+
+volumes:
+  es-data:
+    driver: local

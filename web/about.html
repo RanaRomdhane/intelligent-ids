@@ -1,9 +1,9 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>About - IDS ML | RSK World</title>
+    <title>À Propos - IDS ML</title>
     <link rel="stylesheet" href="css/style.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
@@ -13,14 +13,12 @@
         <div class="container">
             <div class="top-bar-content">
                 <div class="contact-info">
-                    <span><i class="fas fa-envelope"></i> help@rskworld.in</span>
-                    <span><i class="fas fa-phone"></i> +91 93305 39277</span>
+                    <span><i class="fas fa-graduation-cap"></i> Projet Académique 2025</span>
+                    <span><i class="fas fa-users"></i> Rana Romdhane & Oulimata Sall</span>
                 </div>
                 <div class="social-links">
-                    <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
                     <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                    <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
                 </div>
             </div>
         </div>
@@ -38,9 +36,9 @@
                 </div>
                 <nav class="nav" id="nav">
                     <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html" class="active">About</a></li>
-                        <li><a href="demo.html">Demo</a></li>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="about.html" class="active">À Propos</a></li>
+                        <li><a href="demo.html">Démo</a></li>
                         <li><a href="documentation.html">Documentation</a></li>
                         <li><a href="contact.html">Contact</a></li>
                     </ul>
@@ -57,8 +55,8 @@
     <!-- Page Header -->
     <section class="page-header">
         <div class="container">
-            <h1>About IDS ML</h1>
-            <p>Learn more about our Intrusion Detection System powered by Machine Learning</p>
+            <h1>À Propos du Projet IDS ML</h1>
+            <p>Découvrez notre Système de Détection d'Intrusions intelligent basé sur le Machine Learning</p>
         </div>
     </section>
 
@@ -67,35 +65,75 @@
         <div class="container">
             <div class="about-content">
                 <div class="about-text">
-                    <h2>Project Overview</h2>
-                    <p>This project implements an Intrusion Detection System using machine learning algorithms to detect malicious network activities. It analyzes network traffic patterns, packet headers, and flow data to identify various attack types including DoS, DDoS, port scans, and unauthorized access attempts.</p>
+                    <h2>Contexte du Projet</h2>
+                    <p>Dans un contexte où les entreprises sont exposées à un volume croissant de cyberattaques (scan, phishing, malwares, exploitation de vulnérabilités, mouvements latéraux…), la détection précoce des comportements anormaux sur le réseau est devenue indispensable.</p>
                     
-                    <h3>Key Features</h3>
+                    <p>Les mécanismes de sécurité existants (pare-feu, filtrage ACL, antivirus) ne permettent pas d'identifier efficacement les attaques sophistiquées ou les comportements anormaux subtils.</p>
+
+                    <p>Ce projet vise à concevoir un <strong>système intelligent de détection d'intrusions</strong>, capable d'apprendre à partir d'un dataset réel de trafic réseau, afin d'améliorer la posture cybersécurité de l'entreprise et de renforcer les capacités de monitoring du SOC.</p>
+                    
+                    <h3>Objectifs du Projet</h3>
+                    <h4>Objectif Principal</h4>
+                    <p>Développer un système de détection intelligente d'intrusions (IDS) basé sur le machine learning / deep learning pour identifier les comportements anormaux dans le trafic réseau d'une entreprise.</p>
+
+                    <h4>Objectifs Spécifiques</h4>
                     <ul style="list-style: none; padding: 0;">
-                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Network traffic analysis and feature extraction</li>
-                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Multiple ML algorithms (Random Forest, SVM, Neural Networks)</li>
-                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Real-time attack detection</li>
-                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Performance metrics and confusion matrix</li>
-                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Visualization of attack patterns</li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Collecter, préparer et annoter un dataset représentatif du trafic réseau</li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Construire des modèles d'apprentissage supervisé (RF, SVM, NN)</li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Comparer les performances des différents modèles</li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Mettre en place un pipeline complet d'entraînement et test</li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Détecter différentes familles d'attaques</li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Générer une interface web pour visualisation</li>
+                        <li style="margin-bottom: 10px;"><i class="fas fa-check-circle" style="color: var(--success-color); margin-right: 10px;"></i> Proposer une solution intégrable dans un SIEM/SOC</li>
                     </ul>
 
-                    <h3>Technologies</h3>
-                    <p>The project is built using cutting-edge technologies:</p>
+                    <h3>Types d'Attaques Détectées</h3>
                     <div class="tech-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
                         <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
-                            <strong>Python</strong> - Core programming language
+                            <strong><i class="fas fa-bomb"></i> DoS/DDoS</strong>
+                            <p style="font-size: 14px; margin-top: 5px;">Déni de service</p>
                         </div>
                         <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
-                            <strong>Scikit-learn</strong> - ML algorithms
+                            <strong><i class="fas fa-search"></i> Probe/Scan</strong>
+                            <p style="font-size: 14px; margin-top: 5px;">Reconnaissance réseau</p>
                         </div>
                         <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
-                            <strong>TensorFlow</strong> - Deep learning
+                            <strong><i class="fas fa-key"></i> Brute Force</strong>
+                            <p style="font-size: 14px; margin-top: 5px;">Tentatives répétées</p>
                         </div>
                         <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
-                            <strong>Pandas & NumPy</strong> - Data processing
+                            <strong><i class="fas fa-syringe"></i> Injection</strong>
+                            <p style="font-size: 14px; margin-top: 5px;">SQL, XSS, etc.</p>
                         </div>
                         <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
-                            <strong>Jupyter</strong> - Interactive analysis
+                            <strong><i class="fas fa-robot"></i> Botnet</strong>
+                            <p style="font-size: 14px; margin-top: 5px;">Activité de botnet</p>
+                        </div>
+                        <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
+                            <strong><i class="fas fa-download"></i> Exfiltration</strong>
+                            <p style="font-size: 14px; margin-top: 5px;">Vol de données</p>
+                        </div>
+                    </div>
+
+                    <h3 style="margin-top: 40px;">Technologies Utilisées</h3>
+                    <div class="tech-list" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-top: 20px;">
+                        <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
+                            <strong>Python 3.8+</strong> - Langage principal
+                        </div>
+                        <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
+                            <strong>Scikit-learn</strong> - Algorithmes ML
+                        </div>
+                        <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
+                            <strong>TensorFlow/Keras</strong> - Deep learning
+                        </div>
+                        <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
+                            <strong>Pandas & NumPy</strong> - Traitement données
+                        </div>
+                        <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
+                            <strong>Flask</strong> - Framework web
+                        </div>
+                        <div style="background: var(--light-color); padding: 15px; border-radius: 5px;">
+                            <strong>Docker</strong> - Conteneurisation
                         </div>
                     </div>
                 </div>
@@ -106,28 +144,39 @@
     <!-- Team Section -->
     <section class="team-section" style="padding: 60px 0; background: var(--light-color);">
         <div class="container">
-            <h2 class="section-title">About RSK World</h2>
+            <h2 class="section-title">L'Équipe du Projet</h2>
             <div class="team-grid" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px;">
                 <div class="team-card" style="background: #fff; padding: 30px; border-radius: 10px; box-shadow: var(--shadow); text-align: center;">
                     <div class="team-icon" style="width: 100px; height: 100px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 48px;">
-                        <i class="fas fa-user-tie"></i>
+                        <i class="fas fa-user-graduate"></i>
                     </div>
-                    <h3>Molla Samser</h3>
-                    <p style="color: var(--primary-color); font-weight: bold;">Founder</p>
-                    <p>Visionary leader and developer behind RSK World</p>
+                    <h3>Rana Romdhane</h3>
+                    <p style="color: var(--primary-color); font-weight: bold;">Développement & Machine Learning</p>
+                    <p>Spécialisée en ML et développement Python, responsable de l'implémentation des algorithmes et du pipeline d'entraînement.</p>
+                    <div class="social-links" style="margin-top: 15px;">
+                        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    </div>
                 </div>
                 <div class="team-card" style="background: #fff; padding: 30px; border-radius: 10px; box-shadow: var(--shadow); text-align: center;">
                     <div class="team-icon" style="width: 100px; height: 100px; margin: 0 auto 20px; background: linear-gradient(135deg, var(--primary-color), var(--secondary-color)); border-radius: 50%; display: flex; align-items: center; justify-content: center; color: #fff; font-size: 48px;">
-                        <i class="fas fa-palette"></i>
+                        <i class="fas fa-user-graduate"></i>
                     </div>
-                    <h3>Rima Khatun</h3>
-                    <p style="color: var(--primary-color); font-weight: bold;">Designer & Tester</p>
-                    <p>Creative designer and quality assurance specialist</p>
+                    <h3>Oulimata Sall</h3>
+                    <p style="color: var(--primary-color); font-weight: bold;">Développement & Tests</p>
+                    <p>Experte en développement web et tests, responsable de l'interface utilisateur et de l'assurance qualité du système.</p>
+                    <div class="social-links" style="margin-top: 15px;">
+                        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
+                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
+                    </div>
                 </div>
             </div>
             <div style="text-align: center; margin-top: 40px;">
                 <p style="font-size: 18px; color: var(--text-light);">
-                    Founded by Molla Samser, with Designer & Tester Rima Khatun, RSK World is your one-stop destination for free programming resources, source code, and development tools.
+                    <strong>Projet Académique 2025</strong> - Système de Détection d'Intrusions avec Machine Learning
+                </p>
+                <p style="margin-top: 10px;">
+                    Développé dans le cadre de notre formation en cybersécurité et intelligence artificielle.
                 </p>
             </div>
         </div>
@@ -138,39 +187,39 @@
         <div class="container">
             <div class="footer-content">
                 <div class="footer-section">
-                    <h3>About RSK World</h3>
-                    <p>Founded by Molla Samser, with Designer & Tester Rima Khatun, RSK World is your one-stop destination for free programming resources, source code, and development tools.</p>
+                    <h3>À Propos du Projet</h3>
+                    <p>Système de détection d'intrusions intelligent utilisant le Machine Learning pour identifier les attaques réseau et anomalies en temps réel.</p>
+                    <p style="margin-top: 10px;"><strong>Projet Académique 2025</strong></p>
                 </div>
                 <div class="footer-section">
-                    <h3>Quick Links</h3>
+                    <h3>Liens Rapides</h3>
                     <ul>
-                        <li><a href="index.html">Home</a></li>
-                        <li><a href="about.html">About</a></li>
-                        <li><a href="demo.html">Demo</a></li>
+                        <li><a href="index.html">Accueil</a></li>
+                        <li><a href="about.html">À Propos</a></li>
+                        <li><a href="demo.html">Démo</a></li>
                         <li><a href="documentation.html">Documentation</a></li>
                         <li><a href="contact.html">Contact</a></li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h3>Contact Info</h3>
+                    <h3>Technologies</h3>
                     <ul>
-                        <li><i class="fas fa-envelope"></i> help@rskworld.in</li>
-                        <li><i class="fas fa-phone"></i> +91 93305 39277</li>
-                        <li><i class="fas fa-map-marker-alt"></i> Nutanhat, Mongolkote, Purba Burdwan, West Bengal, India, 713147</li>
+                        <li>Python & Machine Learning</li>
+                        <li>TensorFlow & Scikit-learn</li>
+                        <li>Flask & Docker</li>
+                        <li>Pandas & NumPy</li>
                     </ul>
                 </div>
                 <div class="footer-section">
-                    <h3>Follow Us</h3>
-                    <div class="social-links">
-                        <a href="#" aria-label="Facebook"><i class="fab fa-facebook"></i></a>
-                        <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
-                        <a href="#" aria-label="LinkedIn"><i class="fab fa-linkedin"></i></a>
-                        <a href="#" aria-label="GitHub"><i class="fab fa-github"></i></a>
-                    </div>
+                    <h3>Auteurs</h3>
+                    <p><strong>Rana Romdhane</strong></p>
+                    <p>Développement & ML</p>
+                    <p style="margin-top: 10px;"><strong>Oulimata Sall</strong></p>
+                    <p>Développement & Tests</p>
                 </div>
             </div>
             <div class="footer-bottom">
-                <p>&copy; 2025 RSK World. All rights reserved. | <a href="privacy.html">Privacy Policy</a> | <a href="terms.html">Terms & Conditions</a></p>
+                <p>&copy; 2025 Rana Romdhane & Oulimata Sall. Projet Académique. Tous droits réservés.</p>
             </div>
         </div>
     </footer>
@@ -178,4 +227,3 @@
     <script src="js/main.js"></script>
 </body>
 </html>
-

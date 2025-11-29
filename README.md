@@ -1,490 +1,526 @@
-# Intrusion Detection System (IDS) with Machine Learning
+# 🛡️ IDS ML - Système de Détection d'Intrusions Intelligent
 
-A machine learning-based intrusion detection system to identify network attacks and anomalies in real-time.
+[![Python](https://img.shields.io/badge/Python-3.8+-blue.svg)](https://www.python.org/)
+[![TensorFlow](https://img.shields.io/badge/TensorFlow-2.16-orange.svg)](https://www.tensorflow.org/)
+[![Flask](https://img.shields.io/badge/Flask-3.0-green.svg)](https://flask.palletsprojects.com/)
+[![License](https://img.shields.io/badge/License-Academic-purple.svg)](LICENSE)
 
-**Version**: 1.0.0  
-**Repository**: [https://github.com/rskworld/ids-ml](https://github.com/rskworld/ids-ml)
+Système intelligent de détection d'intrusions réseau basé sur le Machine Learning, développé dans le cadre d'un projet académique en cybersécurité.
 
----
-
-## Table of Contents
-
-- [Overview](#overview)
-- [Features](#features)
-- [Technologies](#technologies)
-- [Installation](#installation)
-- [Quick Start](#quick-start)
-- [Usage](#usage)
-- [Web Interface](#web-interface)
-- [API Endpoints](#api-endpoints)
-- [Project Structure](#project-structure)
-- [Dataset Requirements](#dataset-requirements)
-- [Troubleshooting](#troubleshooting)
-- [Contributing](#contributing)
-- [License](#license)
-- [Author](#author)
+**Développé par :** Rana Romdhane & Oulimata Sall  
+**Année :** 2025  
+**Objectif :** Projet Académique - Cybersécurité
 
 ---
 
-## Overview
+## 📋 Table des Matières
 
-This project implements an Intrusion Detection System using machine learning algorithms to detect malicious network activities. It analyzes network traffic patterns, packet headers, and flow data to identify various attack types including DoS, DDoS, port scans, and unauthorized access attempts.
+- [Caractéristiques](#-caractéristiques)
+- [Architecture](#-architecture)
+- [Installation](#-installation)
+- [Configuration](#-configuration)
+- [Utilisation](#-utilisation)
+- [API Documentation](#-api-documentation)
+- [Modèles ML](#-modèles-ml)
+- [Intégration ELK](#-intégration-elk)
+- [Surveillance Temps Réel](#-surveillance-temps-réel)
+- [Structure du Projet](#-structure-du-projet)
+- [Contribuer](#-contribuer)
+- [License](#-license)
 
-## Features
+---
 
-- **Network traffic analysis and feature extraction**: Comprehensive feature engineering from network packet data
-- **Multiple ML algorithms**: Random Forest, SVM, and Neural Networks for attack detection
-- **Real-time attack detection**: Live monitoring and classification of network traffic
-- **Performance metrics and confusion matrix**: Detailed evaluation of model performance
-- **Visualization of attack patterns**: Interactive plots and charts for data analysis
-- **Web Interface**: Complete web application with demo, documentation, and contact pages
-- **REST API**: Programmatic access to ML models via API endpoints
+## ✨ Caractéristiques
 
-## Technologies
+### 🎯 Fonctionnalités Principales
 
-- Python 3.8+
-- Scikit-learn
-- TensorFlow
-- Pandas
-- NumPy
-- Jupyter Notebook
-- Flask (for web interface)
+- **Détection Multi-Modèles** : Random Forest, SVM, et Réseaux de Neurones
+- **Analyse Temps Réel** : Monitoring continu du trafic réseau
+- **Système d'Alertes** : Notifications automatiques avec niveaux de sévérité
+- **Intégration SIEM** : Support ELK Stack (Elasticsearch, Logstash, Kibana)
+- **Dashboard Interactif** : Visualisation en temps réel avec WebSockets
+- **API REST** : Endpoints pour intégration externe
+- **Métriques Détaillées** : Accuracy, Precision, Recall, F1-Score, ROC/AUC
 
-## Installation
+### 🎯 Types d'Attaques Détectées
 
-### Prerequisites
+- DoS/DDoS (Denial of Service)
+- Port Scan & Reconnaissance (Probe)
+- Brute Force
+- SQL Injection
+- Remote to Local (R2L)
+- User to Root (U2R)
+- Botnet Activity
+- Data Exfiltration
 
-- Python 3.8 or higher
-- pip (Python package installer)
-- Git (optional, for cloning the repository)
+---
 
-### Installation Steps
+## 🏗️ Architecture
 
-#### 1. Clone or Download the Project
-
-```bash
-git clone https://github.com/rskworld/ids-ml.git
-cd ids-ml
+```
+┌─────────────────────────────────────────────────────────┐
+│                    Interface Web                        │
+│  (Dashboard Temps Réel | Démo | Documentation)          │
+└──────────────────┬──────────────────────────────────────┘
+                   │
+┌──────────────────▼──────────────────────────────────────┐
+│              API Flask + WebSocket                       │
+│  (REST Endpoints | Real-time Communication)             │
+└──────────┬────────────────┬────────────┬────────────────┘
+           │                │            │
+     ┌─────▼─────┐    ┌────▼────┐  ┌───▼────┐
+     │  ML       │    │ Alert   │  │  ELK   │
+     │  Models   │    │ Manager │  │  Stack │
+     └───────────┘    └─────────┘  └────────┘
+           │
+     ┌─────▼──────────────────┐
+     │  Data Preprocessing     │
+     │  (Feature Engineering)  │
+     └────────────────────────┘
 ```
 
-Or extract the downloaded ZIP file and navigate to the project directory.
+---
 
-#### 2. Create a Virtual Environment (Recommended)
+## 🚀 Installation
 
-**Windows:**
+### Prérequis
+
+- Python 3.8 ou supérieur
+- pip (gestionnaire de paquets Python)
+- (Optionnel) ELK Stack pour intégration SIEM
+- (Optionnel) Docker pour conteneurisation
+
+### Installation Rapide
+
 ```bash
+# 1. Cloner le repository
+git clone https://github.com/RanaRomdhane/intelligent-ids.git
+cd intelligent-ids
+
+# 2. Créer un environnement virtuel
 python -m venv venv
-venv\Scripts\activate
-```
 
-**Linux/Mac:**
-```bash
-python3 -m venv venv
+# 3. Activer l'environnement virtuel
+# Sur Linux/Mac:
 source venv/bin/activate
-```
+# Sur Windows:
+venv\Scripts\activate
 
-#### 3. Install Dependencies
-
-```bash
+# 4. Installer les dépendances
 pip install -r requirements.txt
+
+# 5. Créer les répertoires nécessaires
+python -c "from config import Config; Config.init_directories()"
+
+# 6. Entraîner les modèles (première utilisation)
+python scripts/train.py
+
+# 7. Démarrer le système
+python start.py
 ```
 
-**Note:** If you encounter issues with TensorFlow installation, you may need to:
-- Use a specific TensorFlow version compatible with your system
-- Install CPU-only version: `pip install tensorflow-cpu==2.15.0`
+### Installation avec Docker (Recommandé pour Production)
 
-#### 4. Verify Installation
-
-Run the example script to verify everything is set up correctly:
 ```bash
-python example_usage.py
+# Build l'image Docker
+docker build -t ids-ml:latest .
+
+# Lancer le conteneur
+docker run -p 5000:5000 -v $(pwd)/data:/app/data ids-ml:latest
 ```
 
-This will:
-- Create sample data
-- Preprocess the data
-- Train a simple model
-- Evaluate and save the model
+---
 
-## Quick Start
+## ⚙️ Configuration
 
-### Option 1: Using Command Line Scripts
+### Configuration de Base
 
-1. **Train all models:**
-   ```bash
-   python scripts/train.py --data data/raw/your_dataset.csv
-   ```
+Créer un fichier `.env` à la racine du projet :
 
-2. **Make predictions:**
-   ```bash
-   python scripts/predict.py --input data/raw/test_data.csv --model random_forest
-   ```
+```env
+# Application
+FLASK_ENV=development
+SECRET_KEY=your-secret-key-here
+DEBUG=True
+PORT=5000
 
-### Option 2: Using Jupyter Notebooks
+# Alert Manager
+EMAIL_ENABLED=false
+SMTP_SERVER=smtp.gmail.com
+SMTP_PORT=587
+SMTP_FROM=ids@example.com
+SMTP_TO=admin@example.com
+SMTP_USERNAME=your-email@gmail.com
+SMTP_PASSWORD=your-app-password
 
-1. **Start Jupyter Notebook:**
-   ```bash
-   jupyter notebook
-   ```
+# ELK Stack
+ELASTICSEARCH_HOSTS=localhost:9200
+ELASTICSEARCH_USERNAME=elastic
+ELASTICSEARCH_PASSWORD=your-password
+SIEM_ENABLED=false
 
-2. **Open and run notebooks in order:**
-   - `notebooks/data_exploration.ipynb` - Explore your dataset
-   - `notebooks/model_training.ipynb` - Train models
-   - `notebooks/evaluation.ipynb` - Evaluate models
+# Monitoring
+NETWORK_INTERFACE=eth0
+LOG_LEVEL=INFO
+```
 
-### Option 3: Using Python API
+### Configuration des Modèles
+
+Les paramètres des modèles ML peuvent être ajustés dans `config.py` :
 
 ```python
-from src.preprocessing import DataPreprocessor
-from src.models import RandomForestIDS
-from src.evaluation import ModelEvaluator
-
-# Load and preprocess data
-preprocessor = DataPreprocessor()
-df = preprocessor.load_data('data/raw/your_data.csv')
-df_cleaned = preprocessor.clean_data(df)
-df_features = preprocessor.extract_features(df_cleaned)
-X_train, X_test, y_train, y_test = preprocessor.prepare_data(df_features)
-
-# Train model
-model = RandomForestIDS()
-model.train(X_train, y_train)
-
-# Evaluate
-evaluator = ModelEvaluator("Random Forest")
-y_pred = model.predict(X_test)
-metrics = evaluator.evaluate(y_test, y_pred)
+ML_CONFIG = {
+    'test_size': 0.2,
+    'random_state': 42,
+    'random_forest': {
+        'n_estimators': 100,
+        'max_depth': None
+    },
+    # ... autres paramètres
+}
 ```
 
-## Usage
+---
 
-### Web Interface
+## 💻 Utilisation
 
-Start the web application:
+### 1. Démarrage Rapide
+
 ```bash
+# Démarrage avec script automatique
+python start.py
+
+# Ou démarrage manuel
 python app.py
 ```
 
-Then open your browser and navigate to `http://localhost:5000`
+Le système sera accessible à :
+- **Interface Web** : http://localhost:5000
+- **Dashboard** : http://localhost:5000/dashboard
+- **Démo** : http://localhost:5000/demo.html
 
-The web interface includes:
-- **Home Page**: Project overview and features
-- **Demo Page**: Upload CSV files and get real-time predictions
-- **Documentation**: Complete usage guide
-- **Contact Page**: Get in touch with the team
-- **About Page**: Learn more about the project
+### 2. Entraînement des Modèles
 
-### Data Preparation
-
-1. Place your network traffic dataset in the `data/raw/` directory
-2. Run the preprocessing script:
 ```bash
-python src/preprocessing.py
-```
-
-### Model Training
-
-Train all models:
-```bash
+# Entraîner tous les modèles
 python scripts/train.py
+
+# Entraîner un modèle spécifique
+python scripts/train.py --model random_forest
+
+# Avec dataset personnalisé
+python scripts/train.py --data data/raw/your_dataset.csv
 ```
 
-Or use the Jupyter notebook:
-```bash
-jupyter notebook notebooks/model_training.ipynb
-```
-
-### Real-time Detection
-
-Run the real-time detection script:
-```bash
-python scripts/predict.py --input <network_traffic_file>
-```
-
-Or use the web interface to upload files and get predictions through the browser.
-
-### Jupyter Notebooks
-
-Explore the data and models using the provided notebooks:
-- `notebooks/data_exploration.ipynb`: Data analysis and visualization
-- `notebooks/model_training.ipynb`: Model training and comparison
-- `notebooks/evaluation.ipynb`: Model evaluation and metrics
-
-## Web Interface
-
-### Running the Web Application
-
-#### 1. Train Models (First Time)
-
-Before using the web interface, you need to train the models:
+### 3. Prédictions sur Nouvelles Données
 
 ```bash
-python scripts/train.py
+# Via ligne de commande
+python scripts/predict.py --input data/raw/test_data.csv --model random_forest
+
+# Via l'interface web (méthode recommandée)
+# Accéder à http://localhost:5000/demo.html
 ```
 
-This will create the necessary model files in the `models/` directory.
+### 4. Surveillance Temps Réel
 
-#### 2. Start the Web Server
+```python
+# Démarrer via API
+curl -X POST http://localhost:5000/api/monitoring/start
 
-```bash
-python app.py
+# Ou via le dashboard web
+# Accéder à http://localhost:5000/dashboard
 ```
 
-The application will start on `http://localhost:5000`
+---
 
-#### 3. Access the Web Interface
+## 📚 API Documentation
 
-Open your browser and navigate to:
-- Home: `http://localhost:5000/`
-- Demo: `http://localhost:5000/demo.html`
-- Contact: `http://localhost:5000/contact.html`
-- Documentation: `http://localhost:5000/documentation.html`
+### Endpoints Principaux
 
-### Web Pages
+#### Prédiction
 
-1. **Home Page** (`index.html`)
-   - Project overview and hero section
-   - Key features showcase
-   - Technologies used
-   - Statistics and metrics
+```http
+POST /api/predict
+Content-Type: multipart/form-data
 
-2. **About Page** (`about.html`)
-   - Project overview
-   - Team information (Molla Samser & Rima Khatun)
-   - Technology stack details
+Parameters:
+- file: CSV file containing network traffic data
+- model: Model name (random_forest, svm, neural_network)
 
-3. **Demo Page** (`demo.html`)
-   - Upload CSV files for analysis
-   - Real-time attack detection
-   - Model selection (Random Forest, SVM, Neural Network)
-   - Results visualization
-
-4. **Documentation Page** (`documentation.html`)
-   - Installation instructions
-   - Usage examples
-   - API reference
-   - Dataset format guide
-
-5. **Contact Page** (`contact.html`)
-   - Contact information
-   - General inquiry form
-   - Content removal request form
-   - Statistics display
-
-6. **Legal Pages**
-   - Privacy Policy (`privacy.html`)
-   - Terms & Conditions (`terms.html`)
-   - Disclaimer (`disclaimer.html`)
-
-### Web Interface Structure
-
-```
-web/
-├── index.html          # Home page
-├── about.html          # About page
-├── demo.html           # Demo/upload page
-├── documentation.html  # Documentation
-├── contact.html        # Contact page
-├── privacy.html        # Privacy policy
-├── terms.html          # Terms & conditions
-├── disclaimer.html     # Disclaimer
-├── css/
-│   └── style.css       # Main stylesheet
-└── js/
-    ├── main.js         # Main JavaScript
-    ├── contact.js      # Contact form handling
-    └── demo.js         # Demo page functionality
-```
-
-## API Endpoints
-
-### POST /api/predict
-Upload a CSV file and get predictions.
-
-**Request:**
-- Method: POST
-- Content-Type: multipart/form-data
-- Parameters:
-  - `file`: CSV file (required)
-  - `model`: Model name (random_forest, svm, neural_network)
-
-**Response:**
-```json
+Response:
 {
   "success": true,
-  "total_samples": 100,
-  "predictions": {
-    "normal": 80,
-    "dos": 15,
-    "probe": 5
-  },
+  "total_samples": 1000,
+  "predictions": {"normal": 800, "dos": 150, "probe": 50},
   "accuracy": 95.5,
-  "model": "random_forest"
+  "alerts_count": 200
 }
 ```
 
-### GET /api/models
-List available trained models.
+#### Statistiques Système
 
-**Response:**
-```json
-{
-  "available_models": ["random_forest", "svm", "neural_network"],
-  "total": 3
-}
-```
+```http
+GET /api/stats
 
-### GET /api/stats
-Get system statistics.
-
-**Response:**
-```json
+Response:
 {
   "models_loaded": 3,
   "available_models": ["random_forest", "svm", "neural_network"],
-  "preprocessor_loaded": true
+  "preprocessor_loaded": true,
+  "alert_manager_active": true,
+  "elk_connected": true,
+  "monitoring_active": false
 }
 ```
 
-### POST /api/train
-Train a new model (requires authentication in production).
+#### Gestion du Monitoring
 
-## Project Structure
+```http
+# Démarrer
+POST /api/monitoring/start
 
-```
-ids-ml/
-├── data/                    # Dataset directory
-│   ├── raw/                # Raw network traffic data
-│   └── processed/          # Processed features
-├── models/                  # Trained model files
-├── notebooks/               # Jupyter notebooks
-│   ├── data_exploration.ipynb
-│   ├── model_training.ipynb
-│   └── evaluation.ipynb
-├── src/                     # Source code
-│   ├── preprocessing.py     # Data preprocessing
-│   ├── models.py           # ML model definitions
-│   ├── evaluation.py       # Model evaluation
-│   ├── visualization.py    # Visualization utilities
-│   └── feature_extraction.py # Feature engineering
-├── scripts/                 # Utility scripts
-│   ├── train.py            # Training script
-│   └── predict.py          # Prediction script
-├── web/                     # Web interface
-│   ├── index.html
-│   ├── css/
-│   └── js/
-├── uploads/                 # Upload directory
-├── app.py                   # Flask web application
-├── requirements.txt         # Python dependencies
-└── README.md               # This file
+# Arrêter
+POST /api/monitoring/stop
+
+# Obtenir les stats
+GET /api/monitoring/stats
 ```
 
-## Dataset Requirements
+#### Gestion des Alertes
 
-The project expects network traffic data with the following structure:
+```http
+# Lister les alertes
+GET /api/alerts?limit=50&severity=high
 
-### Required Columns:
-- At least one numeric feature column
-- A target column named one of: `label`, `attack`, `class`, or `target`
-
-### Supported Datasets:
-- NSL-KDD
-- UNSW-NB15
-- CICIDS2017
-- Custom network traffic data
-
-### Sample Data Format:
-```csv
-duration,protocol_type,service,src_bytes,dst_bytes,count,label
-0,tcp,http,1000,2000,5,normal
-1,udp,ftp,500,1500,3,dos
-...
+# Mettre à jour le statut
+PUT /api/alerts/{alert_id}/status
+{
+  "status": "acknowledged"
+}
 ```
 
-## Model Performance
+### WebSocket Events
 
-The system includes three ML algorithms:
-- **Random Forest**: Fast training, good interpretability
-- **SVM**: Effective for high-dimensional data
-- **Neural Network**: Deep learning approach for complex patterns
+```javascript
+// Connexion
+socket = io('http://localhost:5000');
 
-## Troubleshooting
+// Recevoir les mises à jour de stats
+socket.on('stats_update', function(data) {
+    console.log('Stats:', data);
+});
 
-### Issue: Import errors
-**Solution:** Make sure you've activated the virtual environment and installed all dependencies.
-
-### Issue: TensorFlow installation fails
-**Solution:** 
-- Try: `pip install tensorflow-cpu==2.15.0`
-- Or use a different TensorFlow version compatible with your Python version
-
-### Issue: Memory errors during training
-**Solution:**
-- Reduce dataset size
-- Use smaller models (fewer estimators for Random Forest)
-- Process data in batches
-
-### Issue: Model training is slow
-**Solution:**
-- Use smaller datasets for testing
-- Reduce model complexity
-- Use CPU-optimized versions of libraries
-
-### Models Not Loading
-- Ensure models are trained: `python scripts/train.py`
-- Check that model files exist in `models/` directory
-- Verify preprocessor is saved: `models/preprocessor.pkl`
-
-### File Upload Issues
-- Check file size (max 10MB)
-- Ensure file is CSV format
-- Verify file has correct column structure
-
-### API Errors
-- Check Flask console for error messages
-- Verify models are loaded on startup
-- Ensure data format matches expected structure
-
-## Security Notes
-
-For production deployment:
-1. Add authentication to `/api/train` endpoint
-2. Implement rate limiting
-3. Add CSRF protection
-4. Use HTTPS
-5. Validate and sanitize all inputs
-6. Implement file size limits
-7. Add logging and monitoring
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-## License
-
-This project is open source and available under the MIT License.
-
-Copyright (c) 2025 Molla Samser & Rima Khatun (RSK World)  
-Copyright (c) 2025 rskworld.in
-
-## Author
-
-**Molla Samser** - Founder  
-**Rima Khatun** - Designer & Tester
-
-### Contact Information
-
-- **Email**: help@rskworld.in | support@rskworld.in
-- **Phone**: +91 93305 39277
-- **Website**: [rskworld.in](https://rskworld.in)
-- **Location**: Nutanhat, Mongolkote, Purba Burdwan, West Bengal, India, 713147
-
-### About RSK World
-
-Founded by Molla Samser, with Designer & Tester Rima Khatun, RSK World is your one-stop destination for free programming resources, source code, and development tools.
+// Recevoir les nouvelles alertes
+socket.on('new_alert', function(alert) {
+    console.log('Alert:', alert);
+});
+```
 
 ---
 
-**Version**: 1.0.0  
-**Repository**: [https://github.com/rskworld/ids-ml](https://github.com/rskworld/ids-ml)
+## 🤖 Modèles ML
+
+### Random Forest
+
+**Caractéristiques** :
+- Ensemble de 100 arbres de décision
+- Excellente performance sur données déséquilibrées
+- Résistant au surapprentissage
+
+**Utilisation** :
+```python
+from src.models import RandomForestIDS
+
+model = RandomForestIDS(n_estimators=100, random_state=42)
+model.train(X_train, y_train)
+predictions = model.predict(X_test)
+```
+
+### SVM (Support Vector Machine)
+
+**Caractéristiques** :
+- Kernel RBF pour classification non-linéaire
+- Bon pour données haute dimension
+- Nécessite normalisation des features
+
+### Neural Network
+
+**Architecture** :
+- Couches cachées : [128, 64]
+- Dropout : 0.3
+- Activation : ReLU
+- Optimiseur : Adam
+
+---
+
+## 📊 Intégration ELK
+
+### Installation d'Elasticsearch
+
+```bash
+# Avec Docker
+docker run -d \
+  --name elasticsearch \
+  -p 9200:9200 \
+  -e "discovery.type=single-node" \
+  docker.elastic.co/elasticsearch/elasticsearch:8.12.0
+
+# Vérifier la connexion
+curl http://localhost:9200
+```
+
+### Configuration dans IDS ML
+
+```python
+# Le système se connecte automatiquement si ELK est disponible
+# Configuration dans config.py ou .env
+ELASTICSEARCH_HOSTS=localhost:9200
+SIEM_ENABLED=true
+```
+
+### Visualisation dans Kibana
+
+1. Accéder à Kibana : http://localhost:5601
+2. Créer un index pattern : `ids-*`
+3. Les dashboards sont automatiquement peuplés
+
+---
+
+## 📡 Surveillance Temps Réel
+
+### Architecture
+
+```
+Capture Réseau → Extraction Features → ML Model → Alert Manager → Dashboard
+     (Scapy)         (Pipeline)        (Predict)     (Notify)      (WebSocket)
+```
+
+### Configuration
+
+```python
+# Dans config.py
+MONITORING_INTERFACE = 'eth0'  # Interface réseau à surveiller
+MONITORING_UPDATE_INTERVAL = 2  # Secondes entre mises à jour
+```
+
+### Utilisation
+
+```bash
+# Démarrer le monitoring
+python start.py
+
+# Dans le dashboard web
+# Cliquer sur "Démarrer Surveillance"
+```
+
+---
+
+## 📁 Structure du Projet
+
+```
+ids-ml/
+├── app.py                      # Application Flask principale
+├── config.py                   # Configuration centralisée
+├── start.py                    # Script de démarrage
+├── requirements.txt            # Dépendances Python
+├── README.md                   # Ce fichier
+│
+├── src/                        # Code source
+│   ├── __init__.py
+│   ├── preprocessing.py        # Prétraitement des données
+│   ├── models.py              # Modèles ML
+│   ├── evaluation.py          # Métriques et évaluation
+│   ├── visualization.py       # Visualisations
+│   ├── alert_system.py        # Système d'alertes
+│   ├── realtime_monitor.py    # Monitoring temps réel
+│   ├── elk_integration.py     # Intégration ELK
+│   └── feature_extraction.py  # Extraction de features
+│
+├── scripts/                    # Scripts utilitaires
+│   ├── train.py               # Entraînement des modèles
+│   └── predict.py             # Prédictions
+│
+├── web/                        # Interface web
+│   ├── index.html             # Page d'accueil
+│   ├── dashboard.html         # Dashboard temps réel
+│   ├── demo.html              # Démo interactive
+│   ├── about.html             # À propos
+│   ├── css/                   # Styles CSS
+│   └── js/                    # Scripts JavaScript
+│
+├── notebooks/                  # Jupyter Notebooks
+│   ├── data_exploration.ipynb
+│   ├── model_training.ipynb
+│   └── evaluation.ipynb
+│
+├── data/                       # Données
+│   ├── raw/                   # Données brutes
+│   └── processed/             # Données traitées
+│
+├── models/                     # Modèles entraînés
+│   ├── random_forest_model.pkl
+│   ├── svm_model.pkl
+│   ├── neural_network_model.h5
+│   └── preprocessor.pkl
+│
+└── logs/                       # Fichiers de log
+    ├── app.log
+    ├── alerts.log
+    └── realtime_monitor.log
+```
+
+---
+
+## 🤝 Contribuer
+
+Ce projet est développé dans un cadre académique. Les contributions sont les bienvenues !
+
+### Comment Contribuer
+
+1. Fork le projet
+2. Créer une branche (`git checkout -b feature/amelioration`)
+3. Commit les changements (`git commit -m 'Ajout fonctionnalité'`)
+4. Push vers la branche (`git push origin feature/amelioration`)
+5. Ouvrir une Pull Request
+
+---
+
+## 📄 License
+
+Ce projet est développé à des fins académiques et éducatives.
+
+**© 2025 Rana Romdhane & Oulimata Sall**
+
+Tous droits réservés. Voir [LICENSE](LICENSE) pour plus de détails.
+
+---
+
+## 📞 Contact
+
+- **Rana Romdhane** - Développement & ML
+- **Oulimata Sall** - Développement & Tests
+
+**Email** : rana.romdhane@enicar.ucar.tn
+
+---
+
+## 🙏 Remerciements
+
+- Communauté Open Source pour les outils et bibliothèques
+- Datasets publics : CICIDS2017, UNSW-NB15
+- TensorFlow, scikit-learn, Flask communities
+
+---
+
+## 📚 Références
+
+1. [CICIDS2017 Dataset](https://www.unb.ca/cic/datasets/ids-2017.html)
+2. [UNSW-NB15 Dataset](https://research.unsw.edu.au/projects/unsw-nb15-dataset)
+3. [MITRE ATT&CK Framework](https://attack.mitre.org/)
+4. Documentation TensorFlow & scikit-learn
+
+---
+
+**Projet Académique 2025 - Cybersécurité**  
+*Système de Détection d'Intrusions avec Machine Learning*

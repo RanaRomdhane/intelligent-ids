@@ -62,6 +62,9 @@ class DataPreprocessor:
         """
         print("Cleaning data...")
         
+        # IMPORTANT: Copier le DataFrame pour éviter SettingWithCopyWarning
+        df = df.copy()
+        
         # Remove duplicate rows
         initial_shape = df.shape[0]
         df = df.drop_duplicates()
@@ -105,20 +108,32 @@ class DataPreprocessor:
         """
         print("Extracting features...")
         
+        # Copier le DataFrame
+        df_encoded = df.copy()
+        
         # Identify numeric and categorical columns
         numeric_cols = df.select_dtypes(include=[np.number]).columns.tolist()
         categorical_cols = df.select_dtypes(include=['object']).columns.tolist()
         
+        # Liste étendue des noms possibles pour la colonne cible
+        target_cols = [
+            'label', 'Label', 'LABEL',
+            'attack', 'Attack', 'ATTACK',
+            'class', 'Class', 'CLASS',
+            'target', 'Target', 'TARGET',
+            'category', 'Category', 'CATEGORY',
+            'type', 'Type', 'TYPE',
+            'attack_cat', 'Attack_Cat', 'ATTACK_CAT'
+        ]
+        
         # Remove target column if present
-        target_cols = ['label', 'attack', 'class', 'target']
         for col in target_cols:
             if col in numeric_cols:
                 numeric_cols.remove(col)
             if col in categorical_cols:
                 categorical_cols.remove(col)
         
-        # Encode categorical variables
-        df_encoded = df.copy()
+        # Encode categorical variables (sauf la cible)
         for col in categorical_cols:
             if col not in target_cols:
                 le = LabelEncoder()
@@ -130,13 +145,54 @@ class DataPreprocessor:
         
         return df_encoded
     
-    def prepare_data(self, df, target_column='label', test_size=0.2, random_state=42):
+    def find_target_column(self, df):
+        """
+        Trouve automatiquement la colonne cible dans le DataFrame.
+        
+        Args:
+            df: DataFrame
+            
+        Returns:
+            str: Nom de la colonne cible trouvée
+        """
+        # Liste des noms possibles (ordre de priorité)
+        possible_names = [
+            'Label', 'label', 'LABEL',
+            'Attack', 'attack', 'ATTACK',
+            'Class', 'class', 'CLASS',
+            'Target', 'target', 'TARGET',
+            'Category', 'category', 'CATEGORY',
+            'Type', 'type', 'TYPE',
+            'Attack_Cat', 'attack_cat', 'ATTACK_CAT'
+        ]
+        
+        # Vérifier chaque nom possible
+        for name in possible_names:
+            if name in df.columns:
+                return name
+        
+        # Si aucun nom trouvé, chercher des colonnes contenant ces mots
+        for col in df.columns:
+            col_lower = col.lower().strip()
+            if any(keyword in col_lower for keyword in ['label', 'attack', 'class', 'target', 'category', 'type']):
+                return col
+        
+        # En dernier recours, vérifier la dernière colonne
+        last_col = df.columns[-1]
+        # Si c'est une colonne catégorielle avec peu de valeurs uniques, c'est probablement la cible
+        if df[last_col].dtype == 'object' and df[last_col].nunique() < 50:
+            print(f"⚠️  Utilisation de la dernière colonne comme cible: {last_col}")
+            return last_col
+        
+        return None
+    
+    def prepare_data(self, df, target_column=None, test_size=0.2, random_state=42):
         """
         Prepare data for training by splitting and scaling.
         
         Args:
             df: Input DataFrame
-            target_column: Name of the target column
+            target_column: Name of the target column (None = auto-detect)
             test_size: Proportion of test set
             random_state: Random seed
             
@@ -145,24 +201,40 @@ class DataPreprocessor:
         """
         print("Preparing data for training...")
         
-        # Identify target column
-        possible_targets = ['label', 'attack', 'class', 'target']
-        target_col = None
-        for col in possible_targets:
-            if col in df.columns:
-                target_col = col
-                break
+        # Trouver la colonne cible
+        if target_column is None:
+            target_col = self.find_target_column(df)
+        else:
+            target_col = target_column
         
         if target_col is None:
-            raise ValueError("Target column not found. Expected one of: label, attack, class, target")
+            # Afficher les colonnes disponibles pour aider au débogage
+            print("\n❌ Colonnes disponibles dans le dataset:")
+            for i, col in enumerate(df.columns, 1):
+                print(f"  {i:3d}. {col}")
+            print("\n💡 Suggestion: Spécifiez le nom exact de la colonne cible")
+            raise ValueError(
+                "Target column not found. Please specify the target column name.\n"
+                "Available columns are listed above."
+            )
+        
+        print(f"✓ Colonne cible identifiée: {target_col}")
         
         # Separate features and target
         X = df[self.feature_columns].copy()
         y = df[target_col].copy()
         
+        # Afficher la distribution des classes
+        print(f"\nDistribution des classes:")
+        class_dist = y.value_counts()
+        for label, count in class_dist.items():
+            print(f"  {label}: {count} ({count/len(y)*100:.2f}%)")
+        
         # Encode target labels
         if y.dtype == 'object':
             y = self.label_encoder.fit_transform(y)
+            print(f"\n✓ Classes encodées: {len(self.label_encoder.classes_)} classes")
+            print(f"  Mapping: {dict(enumerate(self.label_encoder.classes_))}")
         
         # Split data
         X_train, X_test, y_train, y_test = train_test_split(
@@ -176,7 +248,7 @@ class DataPreprocessor:
         X_train = pd.DataFrame(X_train_scaled, columns=self.feature_columns, index=X_train.index)
         X_test = pd.DataFrame(X_test_scaled, columns=self.feature_columns, index=X_test.index)
         
-        print(f"Training set: {X_train.shape[0]} samples")
+        print(f"\nTraining set: {X_train.shape[0]} samples")
         print(f"Test set: {X_test.shape[0]} samples")
         print(f"Number of classes: {len(np.unique(y))}")
         
@@ -199,6 +271,43 @@ class DataPreprocessor:
         self.label_encoder = preprocessor['label_encoder']
         self.feature_columns = preprocessor['feature_columns']
         print(f"Preprocessor loaded from {file_path}")
+
+    def ensure_feature_compatibility(self, df):
+        """
+        Assure la compatibilité des features entre l'entraînement et la prédiction.
+        
+        Args:
+            df: DataFrame à vérifier
+            
+        Returns:
+            DataFrame: DataFrame avec les features compatibles
+        """
+        if self.feature_columns is None:
+            return df
+        
+        df_compatible = df.copy()
+        
+        # Ajouter les features manquantes avec des valeurs par défaut
+        for feature in self.feature_columns:
+            if feature not in df_compatible.columns:
+                print(f"⚠️  Ajout de la feature manquante: {feature}")
+                if df_compatible.select_dtypes(include=[np.number]).columns.any():
+                    # Utiliser la moyenne des colonnes numériques existantes
+                    default_value = df_compatible.select_dtypes(include=[np.number]).iloc[:, 0].mean()
+                else:
+                    default_value = 0
+                df_compatible[feature] = default_value
+        
+        # Supprimer les features supplémentaires non utilisées pendant l'entraînement
+        extra_features = [col for col in df_compatible.columns if col not in self.feature_columns and col != 'label']
+        if extra_features:
+            print(f"⚠️  Suppression des features non utilisées: {extra_features}")
+            df_compatible = df_compatible.drop(columns=extra_features)
+        
+        # Réorganiser les colonnes dans le bon ordre
+        df_compatible = df_compatible[self.feature_columns]
+        
+        return df_compatible
 
 
 def main():
@@ -248,4 +357,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

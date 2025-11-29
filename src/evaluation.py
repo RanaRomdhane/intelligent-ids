@@ -90,11 +90,22 @@ class ModelEvaluator:
         """
         cm = confusion_matrix(y_true, y_pred)
         
+        # FIX: Properly handle class_names parameter
+        if class_names is not None:
+            # Ensure class_names is a list
+            if isinstance(class_names, np.ndarray):
+                class_names = class_names.tolist()
+            elif not isinstance(class_names, list):
+                class_names = list(class_names)
+            tick_labels = class_names
+        else:
+            tick_labels = [str(i) for i in range(len(cm))]
+        
         plt.figure(figsize=(10, 8))
         sns.heatmap(
             cm, annot=True, fmt='d', cmap='Blues',
-            xticklabels=class_names if class_names else range(len(cm)),
-            yticklabels=class_names if class_names else range(len(cm))
+            xticklabels=tick_labels,
+            yticklabels=tick_labels
         )
         plt.title(f'Confusion Matrix - {self.model_name}')
         plt.ylabel('True Label')
@@ -106,7 +117,7 @@ class ModelEvaluator:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"Confusion matrix saved to {save_path}")
         
-        plt.show()
+        plt.close()  # Close figure to free memory
         return cm
     
     def roc_curve(self, y_true, y_proba, save_path=None):
@@ -140,7 +151,7 @@ class ModelEvaluator:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"ROC curve saved to {save_path}")
         
-        plt.show()
+        plt.close()
     
     def precision_recall_curve(self, y_true, y_proba, save_path=None):
         """
@@ -172,7 +183,7 @@ class ModelEvaluator:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"Precision-Recall curve saved to {save_path}")
         
-        plt.show()
+        plt.close()
     
     def compare_models(self, models_results, save_path=None):
         """
@@ -206,7 +217,7 @@ class ModelEvaluator:
             plt.savefig(save_path, dpi=300, bbox_inches='tight')
             print(f"Model comparison saved to {save_path}")
         
-        plt.show()
+        plt.close()
         
         return df
 
@@ -238,4 +249,3 @@ def evaluate_model(model, X_test, y_test, model_name="Model", class_names=None):
     evaluator.confusion_matrix(y_test, y_pred, class_names)
     
     return metrics, evaluator
-
