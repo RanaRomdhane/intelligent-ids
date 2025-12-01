@@ -348,30 +348,77 @@ def predict():
             predicted_labels = preprocessor.label_encoder.inverse_transform(predictions)
         else:
             predicted_labels = predictions
-        
-        # Count predictions
+
+        # Count predictions - CORRECTION : convertir les clés en strings
         unique, counts = np.unique(predicted_labels, return_counts=True)
         prediction_counts = dict(zip(unique, counts.tolist()))
-        
+
+        # Convertir toutes les clés en strings pour JSON
+        prediction_counts = {str(key): value for key, value in prediction_counts.items()}
+
         # Generate alerts for detected attacks
         alerts_generated = []
         for i, (pred, label, proba) in enumerate(zip(predictions, predicted_labels, probabilities)):
-            if label.lower() != 'normal':
+            # Vérifier si c'est une attaque
+            is_attack = False
+            
+            # Si le label est une chaîne
+            if isinstance(label, str):
+                if label.lower() != 'normal':
+                    is_attack = True
+            else:
+                # Si c'est un nombre, vérifier si ce n'est pas 'normal'
+                if hasattr(preprocessor.label_encoder, 'classes_'):
+                    try:
+                        # Chercher 'normal' dans les classes
+                        normal_idx = None
+                        for idx, class_name in enumerate(preprocessor.label_encoder.classes_):
+                            if isinstance(class_name, str) and class_name.lower() == 'normal':
+                                normal_idx = idx
+                                break
+                        
+                        if normal_idx is None:
+                            # Si 'normal' n'est pas trouvé, supposer que 0 = normal
+                            normal_idx = 0
+                        
+                        if pred != normal_idx:
+                            is_attack = True
+                            # Convertir le nombre en nom de classe pour l'alerte
+                            label = preprocessor.label_encoder.classes_[pred]
+                    except Exception as e:
+                        logger.error(f"Error checking normal class: {e}")
+                        # Fallback: si pred != 0, c'est une attaque
+                        if pred != 0:
+                            is_attack = True
+                            label = f"Attack Class {pred}"
+                else:
+                    # Pas de label_encoder, supposer que 0 = normal
+                    if pred != 0:
+                        is_attack = True
+                        label = f"Attack Class {pred}"
+            
+            # Si c'est une attaque, créer une alerte
+            if is_attack:
                 confidence = float(np.max(proba))
                 
-                # Create alert
+                # Créer l'alerte
                 if alert_manager:
+                    # Récupérer les infos du flux si disponibles
+                    flow_data = {}
+                    if i < len(df):
+                        row = df.iloc[i]
+                        # Convertir les valeurs en types JSON compatibles
+                        flow_data['src_ip'] = str(row.get('src_ip', 'Unknown'))
+                        flow_data['dst_ip'] = str(row.get('dst_ip', 'Unknown'))
+                        flow_data['protocol'] = str(row.get('protocol', 'Unknown'))
+                    
                     alert = alert_manager.create_alert(
-                        prediction=label,
-                        flow_data={
-                            'src_ip': df.iloc[i].get('src_ip', 'Unknown'),
-                            'dst_ip': df.iloc[i].get('dst_ip', 'Unknown'),
-                            'protocol': df.iloc[i].get('protocol', 'Unknown')
-                        },
+                        prediction=str(label),  # Convertir en string
+                        flow_data=flow_data,
                         confidence_score=confidence
                     )
                     alerts_generated.append(alert.to_dict())
-        
+
         # Calculate accuracy if labels are available
         accuracy = None
         if 'label' in df.columns or 'attack' in df.columns or 'class' in df.columns:
@@ -382,20 +429,32 @@ def predict():
             else:
                 y_true_encoded = y_true
             accuracy = float(np.mean(predictions == y_true_encoded) * 100)
-        
+
         # Clean up uploaded file
         os.remove(filepath)
-        
+
         logger.info(f"Analysis complete: {len(predictions)} samples, {len(alerts_generated)} alerts")
-        
+
+        # Préparer les alertes - CORRECTION : s'assurer que toutes les données sont JSON compatibles
+        alert_data = []
+        for alert in alerts_generated[:10]:
+            # Convertir les valeurs numpy en types Python standards
+            clean_alert = {}
+            for key, value in alert.items():
+                if isinstance(value, (np.integer, np.floating)):
+                    clean_alert[key] = float(value) if isinstance(value, np.floating) else int(value)
+                else:
+                    clean_alert[key] = value
+            alert_data.append(clean_alert)
+
         return jsonify({
             'success': True,
-            'total_samples': len(predictions),
-            'predictions': prediction_counts,
+            'total_samples': int(len(predictions)),  # Convertir en int
+            'predictions': prediction_counts,  # Déjà converti en strings
             'accuracy': accuracy,
             'model': model_name,
-            'alerts_count': len(alerts_generated),
-            'alerts': alerts_generated[:10]  # Return first 10 alerts
+            'alerts_count': int(len(alerts_generated)),  # Convertir en int
+            'alerts': alert_data  # Déjà nettoyé
         })
         
     except Exception as e:

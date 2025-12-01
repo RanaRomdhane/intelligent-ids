@@ -78,6 +78,11 @@ def train_all_models(data_path, test_size=0.2, random_state=42):
                     X_train, y_train, test_size=0.2, random_state=random_state
                 )
                 model.train(X_train_nn, y_train_nn, X_val_nn, y_val_nn, epochs=50, batch_size=32)
+            elif model_name == 'SVM':
+                # Convertir en numpy arrays pour éviter les problèmes d'index
+                X_train_svm = X_train.values if isinstance(X_train, pd.DataFrame) else X_train
+                y_train_svm = y_train.values if isinstance(y_train, (pd.Series, pd.DataFrame)) else y_train
+                model.train(X_train_svm, y_train_svm)
             else:
                 model.train(X_train, y_train)
             
