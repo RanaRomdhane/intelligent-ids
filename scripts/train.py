@@ -57,13 +57,18 @@ def train_all_models(data_path, test_size=0.2, random_state=42):
     processed_dir = '../data/processed'
     os.makedirs(processed_dir, exist_ok=True)
 
-    # Sauvegarder les données divisées
-    X_train.to_csv(f'{processed_dir}/X_train.csv', index=False)
-    X_test.to_csv(f'{processed_dir}/X_test.csv', index=False)
-    y_train.to_csv(f'{processed_dir}/y_train.csv', index=False)
-    y_test.to_csv(f'{processed_dir}/y_test.csv', index=False)
+    print(f"Saving processed data to {processed_dir}...")
 
-    print(f"Data saved to {processed_dir}/")
+    # --- CORRECTION ICI ---
+    # Conversion explicite en DataFrame avant sauvegarde pour éviter l'AttributeError
+    # si les données sont des numpy.ndarray
+    pd.DataFrame(X_train).to_csv(f'{processed_dir}/X_train.csv', index=False)
+    pd.DataFrame(X_test).to_csv(f'{processed_dir}/X_test.csv', index=False)
+    pd.DataFrame(y_train).to_csv(f'{processed_dir}/y_train.csv', index=False)
+    pd.DataFrame(y_test).to_csv(f'{processed_dir}/y_test.csv', index=False)
+    # ----------------------
+
+    print(f"Data saved successfully.")
     
     # Save preprocessor
     preprocessor.save_preprocessor('models/preprocessor.pkl')
@@ -201,4 +206,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-

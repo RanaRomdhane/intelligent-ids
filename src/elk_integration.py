@@ -12,31 +12,38 @@ import logging
 class ELKIntegration:
     """Intégration avec Elasticsearch pour SIEM."""
     
-    def __init__(self, hosts=['localhost:9200'], username=None, password=None):
+    def __init__(self, hosts=['http://localhost:9200'], username=None, password=None):
         """
         Initialise la connexion Elasticsearch.
-        
-        Args:
-            hosts: Liste des hôtes Elasticsearch
-            username: Nom d'utilisateur (optionnel)
-            password: Mot de passe (optionnel)
         """
         self.logger = logging.getLogger(__name__)
         
+        # CORRECTION : On s'assure que chaque hôte commence par http://
+        formatted_hosts = []
+        for host in hosts:
+            if not host.startswith('http'):
+                formatted_hosts.append(f"http://{host}")
+            else:
+                formatted_hosts.append(host)
+
         try:
             if username and password:
                 self.es = Elasticsearch(
-                    hosts,
-                    basic_auth=(username, password)
+                    formatted_hosts,
+                    basic_auth=(username, password),
+                    verify_certs=False
                 )
             else:
-                self.es = Elasticsearch(hosts)
+                self.es = Elasticsearch(
+                    formatted_hosts,
+                    verify_certs=False
+                )
             
             # Vérifier la connexion
             if self.es.ping():
-                self.logger.info("✓ Connexion à Elasticsearch établie")
+                self.logger.info(f"✓ Connexion à Elasticsearch établie sur {formatted_hosts}")
             else:
-                self.logger.error("✗ Impossible de se connecter à Elasticsearch")
+                self.logger.error("✗ Impossible de se connecter à Elasticsearch (Ping échoué)")
                 
         except Exception as e:
             self.logger.error(f"Erreur de connexion Elasticsearch: {e}")
@@ -397,12 +404,13 @@ class ELKIntegration:
 def setup_elk_integration():
     """Configure l'intégration ELK complète."""
     elk = ELKIntegration(
-        hosts=['localhost:9200'],
+        # CORRECTION ICI : Ajout de http://
+        hosts=['http://localhost:9200'],
         # username='elastic',
         # password='your_password'
     )
     
-    if elk.es:
+    if elk.es and elk.es.ping():
         print("✓ Connexion à Elasticsearch établie")
         
         # Créer les indices
