@@ -99,4 +99,4 @@ Thumbs.db
 # ELK Stack data
 elasticsearch/data/
 kibana/data/
-logstash/data/
+logstash/data/conf.env
