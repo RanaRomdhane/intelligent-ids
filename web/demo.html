@@ -18,24 +18,24 @@
             background: #fff;
             padding: 40px;
             border-radius: 10px;
-            box-shadow: var(--shadow);
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
             margin-bottom: 30px;
         }
         .upload-area {
-            border: 2px dashed var(--border-color);
+            border: 2px dashed #dee2e6;
             border-radius: 10px;
             padding: 40px;
             text-align: center;
             margin: 20px 0;
-            transition: var(--transition);
+            transition: all 0.3s ease;
             cursor: pointer;
         }
         .upload-area:hover {
-            border-color: var(--primary-color);
-            background: var(--light-color);
+            border-color: #e74c3c;
+            background: #fef5f5;
         }
         .upload-area.dragover {
-            border-color: var(--primary-color);
+            border-color: #e74c3c;
             background: rgba(231, 76, 60, 0.1);
         }
         .results {
@@ -44,48 +44,106 @@
         }
         .results.show {
             display: block;
+            animation: fadeIn 0.5s ease;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         .result-card {
-            background: var(--light-color);
+            background: #f8f9fa;
             padding: 20px;
-            border-radius: 5px;
+            border-radius: 8px;
             margin-bottom: 15px;
+            border-left: 4px solid #3498db;
+        }
+        .result-card h4 {
+            margin-bottom: 15px;
+            color: #2c3e50;
         }
         .prediction-badge {
             display: inline-block;
             padding: 8px 16px;
             border-radius: 20px;
             font-weight: bold;
-            margin-top: 10px;
+            font-size: 14px;
         }
-        .prediction-normal {
-            background: var(--success-color);
+        .prediction-critical {
+            background: #c0392b;
+            color: #fff;
+        }
+        .prediction-high {
+            background: #e74c3c;
+            color: #fff;
+        }
+        .prediction-medium {
+            background: #f39c12;
             color: #fff;
         }
         .prediction-attack {
-            background: var(--primary-color);
+            background: #9b59b6;
+            color: #fff;
+        }
+        .prediction-normal {
+            background: #27ae60;
             color: #fff;
         }
         .loading {
             display: none;
             text-align: center;
-            padding: 20px;
+            padding: 40px;
         }
         .loading.show {
             display: block;
         }
         .spinner {
-            border: 4px solid var(--light-color);
-            border-top: 4px solid var(--primary-color);
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #e74c3c;
             border-radius: 50%;
-            width: 40px;
-            height: 40px;
+            width: 50px;
+            height: 50px;
             animation: spin 1s linear infinite;
-            margin: 0 auto 10px;
+            margin: 0 auto 15px;
         }
         @keyframes spin {
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
+        }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        @keyframes slideOut {
+            from { transform: translateX(0); opacity: 1; }
+            to { transform: translateX(100%); opacity: 0; }
+        }
+        .form-group {
+            margin: 20px 0;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+        .form-group select {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #dee2e6;
+            border-radius: 8px;
+            font-size: 16px;
+            background: #fff;
+            cursor: pointer;
+        }
+        .form-group select:focus {
+            outline: none;
+            border-color: #e74c3c;
+        }
+        details summary {
+            font-weight: 600;
+        }
+        details[open] summary {
+            margin-bottom: 10px;
         }
     </style>
 </head>

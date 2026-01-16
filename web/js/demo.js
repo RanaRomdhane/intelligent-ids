@@ -1,4 +1,4 @@
-// Demo Page JavaScript
+// Demo Page JavaScript - Version Corrigée
 
 document.addEventListener('DOMContentLoaded', function() {
     const uploadArea = document.getElementById('uploadArea');
@@ -10,15 +10,12 @@ document.addEventListener('DOMContentLoaded', function() {
     const modelSelect = document.getElementById('modelSelect');
     let selectedFile = null;
 
-    // Click to upload
     uploadArea.addEventListener('click', () => fileInput.click());
 
-    // File input change
     fileInput.addEventListener('change', function(e) {
         handleFile(e.target.files[0]);
     });
 
-    // Drag and drop
     uploadArea.addEventListener('dragover', function(e) {
         e.preventDefault();
         uploadArea.classList.add('dragover');
@@ -35,7 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
 
     function handleFile(file) {
-        if (file && file.type === 'text/csv' || file.name.endsWith('.csv')) {
+        if (file && (file.type === 'text/csv' || file.name.endsWith('.csv'))) {
             selectedFile = file;
             uploadArea.innerHTML = `
                 <i class="fas fa-check-circle" style="font-size: 48px; color: var(--success-color); margin-bottom: 15px;"></i>
@@ -49,7 +46,6 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
 
-    // Analyze button
     analyzeBtn.addEventListener('click', async function() {
         if (!selectedFile) {
             showNotification('Please select a file first.', 'error');
@@ -65,7 +61,6 @@ document.addEventListener('DOMContentLoaded', function() {
         formData.append('model', modelSelect.value);
 
         try {
-            // In production, this would call the Flask API
             const response = await fetch('/api/predict', {
                 method: 'POST',
                 body: formData
@@ -73,75 +68,206 @@ document.addEventListener('DOMContentLoaded', function() {
 
             if (response.ok) {
                 const data = await response.json();
+                console.log('API Response:', data); // Debug
                 displayResults(data);
             } else {
-                // Simulate results for demo (when API is not available)
-                simulateResults();
+                const errorData = await response.json();
+                showNotification(errorData.error || 'Analysis failed', 'error');
             }
         } catch (error) {
             console.error('Error:', error);
-            // Simulate results for demo
-            simulateResults();
+            showNotification('Server connection error', 'error');
         } finally {
             loading.classList.remove('show');
             analyzeBtn.disabled = false;
         }
     });
 
-    function simulateResults() {
-        // Simulate API response for demo purposes
-        const mockResults = {
-            total_samples: Math.floor(Math.random() * 100) + 50,
-            predictions: {
-                normal: Math.floor(Math.random() * 50) + 30,
-                dos: Math.floor(Math.random() * 20) + 5,
-                probe: Math.floor(Math.random() * 15) + 3,
-                r2l: Math.floor(Math.random() * 10) + 2,
-                u2r: Math.floor(Math.random() * 5) + 1
-            },
-            accuracy: (Math.random() * 10 + 90).toFixed(2),
-            model: modelSelect.value
-        };
-
-        displayResults(mockResults);
-    }
-
     function displayResults(data) {
-        const attacks = Object.entries(data.predictions || {})
-            .filter(([key, value]) => key !== 'normal' && value > 0);
+        const predictions = data.predictions || {};
+        
+        console.log('Predictions received:', predictions); // Debug
+        
+        // Identifier le trafic normal (plusieurs variantes possibles)
+        let normalCount = 0;
+        const normalKeys = ['Normal', 'normal', 'NORMAL', 'Benign', 'benign', 'BENIGN'];
+        
+        for (const key of normalKeys) {
+            if (predictions[key]) {
+                normalCount += predictions[key];
+            }
+        }
+        
+        // Filtrer les attaques (tout ce qui n'est pas normal)
+        const attacks = Object.entries(predictions)
+            .filter(([key, value]) => {
+                const keyLower = key.toLowerCase().trim();
+                // Exclure normal, benign, et les clés numériques qui pourraient être "0"
+                const isNormal = keyLower === 'normal' || keyLower === 'benign' || key === '0';
+                return !isNormal && value > 0;
+            })
+            .map(([key, value]) => {
+                // Formater le nom de la catégorie
+                return [formatCategoryName(key), value];
+            });
+
+        const totalAttacks = attacks.reduce((sum, [_, count]) => sum + count, 0);
 
         let html = `
             <div class="result-card">
-                <h4><i class="fas fa-chart-pie"></i> Summary</h4>
+                <h4><i class="fas fa-chart-pie"></i> Analysis Summary</h4>
                 <p><strong>Total Samples:</strong> ${data.total_samples || 0}</p>
-                <p><strong>Model Used:</strong> ${data.model || 'random_forest'}</p>
-                ${data.accuracy ? `<p><strong>Accuracy:</strong> ${data.accuracy}%</p>` : ''}
+                <p><strong>Model Used:</strong> ${formatModelName(data.model)}</p>
+                ${data.accuracy !== null && data.accuracy !== undefined ? 
+                    `<p><strong>Accuracy:</strong> ${data.accuracy.toFixed(2)}%</p>` : ''}
+                <p><strong>Normal Traffic:</strong> <span style="color: #27ae60; font-weight: bold;">${normalCount}</span> samples</p>
+                <p><strong>Attack Traffic:</strong> <span style="color: #e74c3c; font-weight: bold;">${totalAttacks}</span> samples</p>
             </div>
         `;
 
         if (attacks.length > 0) {
             html += `
                 <div class="result-card">
-                    <h4><i class="fas fa-exclamation-triangle" style="color: var(--primary-color);"></i> Potential Attacks Detected</h4>
-                    ${attacks.map(([type, count]) => `
-                        <div style="margin: 10px 0;">
-                            <span class="prediction-badge prediction-attack">${type.toUpperCase()}</span>
-                            <span style="margin-left: 10px;">${count} instances</span>
-                        </div>
-                    `).join('')}
+                    <h4><i class="fas fa-exclamation-triangle" style="color: #e74c3c;"></i> Attack Categories Detected</h4>
+                    <table style="width: 100%; border-collapse: collapse; margin-top: 15px;">
+                        <thead>
+                            <tr style="background: #f8f9fa;">
+                                <th style="padding: 12px; text-align: left; border-bottom: 2px solid #dee2e6;">Category</th>
+                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Count</th>
+                                <th style="padding: 12px; text-align: center; border-bottom: 2px solid #dee2e6;">Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            ${attacks.sort((a, b) => b[1] - a[1]).map(([type, count]) => {
+                                const percentage = ((count / data.total_samples) * 100).toFixed(1);
+                                const severityClass = getSeverityClass(type);
+                                return `
+                                    <tr>
+                                        <td style="padding: 12px; border-bottom: 1px solid #dee2e6;">
+                                            <span class="prediction-badge ${severityClass}">${type}</span>
+                                        </td>
+                                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">
+                                            <strong>${count}</strong>
+                                        </td>
+                                        <td style="padding: 12px; text-align: center; border-bottom: 1px solid #dee2e6;">
+                                            ${percentage}%
+                                        </td>
+                                    </tr>
+                                `;
+                            }).join('')}
+                        </tbody>
+                    </table>
                 </div>
             `;
+
+            // Section des alertes
+            if (data.alerts_count > 0) {
+                html += `
+                    <div class="result-card">
+                        <h4><i class="fas fa-bell" style="color: #f39c12;"></i> Alerts Generated: ${data.alerts_count}</h4>
+                        <p>Security alerts have been created for detected attacks.</p>
+                        ${data.alerts && data.alerts.length > 0 ? `
+                            <details style="margin-top: 10px;">
+                                <summary style="cursor: pointer; color: #3498db;">View recent alerts</summary>
+                                <ul style="margin-top: 10px; padding-left: 20px;">
+                                    ${data.alerts.slice(0, 5).map(alert => `
+                                        <li style="margin: 5px 0;">
+                                            <strong>${alert.alert_type || 'Unknown'}</strong> - 
+                                            Severity: ${alert.severity || 'N/A'} - 
+                                            Confidence: ${((alert.confidence_score || 0) * 100).toFixed(1)}%
+                                        </li>
+                                    `).join('')}
+                                </ul>
+                            </details>
+                        ` : ''}
+                    </div>
+                `;
+            }
         } else {
             html += `
-                <div class="result-card">
-                    <h4><i class="fas fa-check-circle" style="color: var(--success-color);"></i> No Attacks Detected</h4>
-                    <p>All traffic appears to be normal.</p>
+                <div class="result-card" style="background: #d4edda; border: 1px solid #c3e6cb;">
+                    <h4><i class="fas fa-check-circle" style="color: #28a745;"></i> No Attacks Detected</h4>
+                    <p style="color: #155724;">All ${data.total_samples} samples appear to be normal traffic. Your network looks secure!</p>
                 </div>
             `;
         }
 
         resultsContent.innerHTML = html;
         results.classList.add('show');
+        
+        // Scroll vers les résultats
+        results.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+
+    function formatCategoryName(name) {
+        // Formater les noms de catégories pour l'affichage
+        const categoryMap = {
+            'dos': 'DoS Attack',
+            'ddos': 'DDoS Attack',
+            'probe': 'Probe/Scan',
+            'r2l': 'Remote to Local',
+            'u2r': 'User to Root',
+            'analysis': 'Analysis',
+            'backdoor': 'Backdoor',
+            'backdoors': 'Backdoor',
+            'exploits': 'Exploits',
+            'fuzzers': 'Fuzzers',
+            'generic': 'Generic Attack',
+            'reconnaissance': 'Reconnaissance',
+            'shellcode': 'Shellcode',
+            'worms': 'Worms',
+            'normal': 'Normal',
+            'benign': 'Benign'
+        };
+        
+        const lowerName = name.toLowerCase().trim();
+        
+        // Vérifier le mapping exact
+        if (categoryMap[lowerName]) {
+            return categoryMap[lowerName];
+        }
+        
+        // Vérifier les correspondances partielles
+        for (const [key, value] of Object.entries(categoryMap)) {
+            if (lowerName.includes(key)) {
+                return value;
+            }
+        }
+        
+        // Si pas de correspondance, capitaliser la première lettre
+        return name.charAt(0).toUpperCase() + name.slice(1);
+    }
+
+    function formatModelName(model) {
+        const modelNames = {
+            'random_forest': 'Random Forest',
+            'svm': 'Support Vector Machine (SVM)',
+            'neural_network': 'Neural Network'
+        };
+        return modelNames[model] || model;
+    }
+
+    function getSeverityClass(attackType) {
+        const type = attackType.toLowerCase();
+        
+        // Attaques critiques
+        if (type.includes('dos') || type.includes('ddos') || type.includes('exploit')) {
+            return 'prediction-critical';
+        }
+        
+        // Attaques élevées
+        if (type.includes('backdoor') || type.includes('shellcode') || type.includes('worm')) {
+            return 'prediction-high';
+        }
+        
+        // Attaques moyennes
+        if (type.includes('probe') || type.includes('reconnaissance') || 
+            type.includes('analysis') || type.includes('fuzzer')) {
+            return 'prediction-medium';
+        }
+        
+        // Par défaut
+        return 'prediction-attack';
     }
 
     function showNotification(message, type = 'success') {
@@ -169,4 +295,3 @@ document.addEventListener('DOMContentLoaded', function() {
         }, 3000);
     }
 });
-
